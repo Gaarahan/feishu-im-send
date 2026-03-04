@@ -154,7 +154,7 @@ function getAppCreds() {
   const appSecret = process.env.FEISHU_APP_SECRET || '';
   if (!appId || !appSecret) {
     die(
-      '缺少应用凭证：请设置 FEISHU_APP_ID / FEISHU_APP_SECRET（或运行 feishu-im-send --configure）',
+      '缺少应用凭证：请设置 FEISHU_APP_ID / FEISHU_APP_SECRET（或运行 feishu-im-send --configure 写入 env 文件）',
     );
   }
   return { appId, appSecret };
@@ -231,6 +231,63 @@ async function configureEnv({ envFilePath, appId, appSecret, receiveId, force })
     // ignore
   }
   process.stdout.write(`已写入：${target}\n`);
+
+  return {
+    envFilePath: target,
+    appId: finalAppId,
+    appSecret: finalAppSecret,
+    receiveId: finalReceiveId,
+  };
+}
+
+function isInteractiveTerminal() {
+  return Boolean(process.stdin.isTTY && process.stdout.isTTY && !process.env.CI);
+}
+
+async function ensureAppCreds(envFilePath) {
+  const envPath = envFilePath || getDefaultEnvFilePath();
+
+  // parseArgs 已经 loadEnvFile 过一次，这里再兜底一次，避免调用方绕过 parseArgs。
+  loadEnvFile(envPath);
+
+  const appId = process.env.FEISHU_APP_ID || '';
+  const appSecret = process.env.FEISHU_APP_SECRET || '';
+  if (appId && appSecret) return;
+
+  if (isInteractiveTerminal()) {
+    process.stderr.write(
+      [
+        '未检测到 FEISHU_APP_ID / FEISHU_APP_SECRET，将进入交互式配置并写入 env 文件：',
+        `  ${envPath}`,
+      ].join('\n') + '\n',
+    );
+
+    const out = await configureEnv({
+      envFilePath: envPath,
+      appId: '',
+      appSecret: '',
+      receiveId: '',
+      force: false,
+    });
+
+    if (out && out.appId && out.appSecret) {
+      process.env.FEISHU_APP_ID = out.appId;
+      process.env.FEISHU_APP_SECRET = out.appSecret;
+      if (out.receiveId && !process.env.FEISHU_RECEIVE_ID) {
+        process.env.FEISHU_RECEIVE_ID = out.receiveId;
+      }
+      return;
+    }
+  }
+
+  die(
+    [
+      '缺少应用凭证：请设置 FEISHU_APP_ID / FEISHU_APP_SECRET。',
+      '可选方案：',
+      `  1) 运行 feishu-im-send --configure 写入 env 文件（默认：${envPath}）`,
+      '  2) 在 CI/脚本中直接注入环境变量 FEISHU_APP_ID/FEISHU_APP_SECRET',
+    ].join('\n'),
+  );
 }
 
 async function fetchJson(url, init) {
@@ -415,6 +472,8 @@ async function main() {
     );
     return;
   }
+
+  await ensureAppCreds(envFile || getDefaultEnvFilePath());
 
   let token = await getTenantAccessToken();
 
