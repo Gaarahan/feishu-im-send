@@ -35,3 +35,7 @@
 - 凭证不要写入仓库；只放环境变量或 `~/.config/feishu-im-send/env`。
 - 不要发送敏感信息（token、cookie、用户数据、日志全文等）。
 ```
+
+## 注意
+
+该功能是基于飞书的开放接口-[发送消息](https://open.larkoffice.com/document/server-docs/im-v1/message/create)，请参考其文档配置你的环境变量以使用该功能
