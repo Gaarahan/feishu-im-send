@@ -9,8 +9,8 @@ description: 使用飞书开放平台内部应用发送 text 消息到指定 ope
 
 ## 入口与位置（约定）
 
-- 发送入口（使用 `scripts/` 下脚本）：`node feishu-im-send/scripts/feishu-im-send.js`
-- 工具实现（主脚本）：`feishu-im-send/scripts/feishu-im-send.js`
+- 发送入口（使用 `scripts/` 下脚本）：`node scripts/feishu-im-send.js`
+- 工具实现（主脚本）：`scripts/feishu-im-send.js`
 
 说明：本仓库的 skill 调用与维护以 `scripts/` 下脚本为准；请勿在文档中引用不存在的 `agents/tools/...` 路径。
 
@@ -21,8 +21,8 @@ description: 使用飞书开放平台内部应用发送 text 消息到指定 ope
 ### 输入
 
 - 参数：
-  - `node feishu-im-send/scripts/feishu-im-send.js "消息内容"`
-  - `node feishu-im-send/scripts/feishu-im-send.js --text "消息内容" --receive-id "ou_xxx"`
+  - `node scripts/feishu-im-send.js "消息内容"`
+  - `node scripts/feishu-im-send.js --text "消息内容" --receive-id "ou_xxx"`
 - 环境变量：
   - `FEISHU_APP_ID` / `FEISHU_APP_SECRET`
   - `FEISHU_RECEIVE_ID`（可选：发送消息时作为默认收件人；更推荐显式传 `--receive-id`）
