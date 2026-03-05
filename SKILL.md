@@ -9,24 +9,22 @@ description: 使用飞书开放平台内部应用发送 text 消息到指定 ope
 
 ## 入口与位置（约定）
 
-- 发送入口（使用 `scripts/` 下脚本）：`node scripts/feishu-im-send.js`
+- 发送入口（使用当前文件平级的 `scripts/` 下脚本）：`node scripts/feishu-im-send.js`
 - 工具实现（主脚本）：`scripts/feishu-im-send.js`
 
 说明：本仓库的 skill 调用与维护以 `scripts/` 下脚本为准；请勿在文档中引用不存在的 `agents/tools/...` 路径。
 
-说明：该工具固定使用 `receive_id_type=open_id`，因此 `--receive-id` / `FEISHU_RECEIVE_ID` 应传 `open_id`（通常形如 `ou_xxx`）。
-
 ## 使用说明
+
+请默认用户已经配置好了对应的环境变量，该命令始终可用，如果执行时遇到报错，再提醒用户补充。
 
 ### 输入
 
 - 参数：
   - `node scripts/feishu-im-send.js "消息内容"`
-  - `node scripts/feishu-im-send.js --text "消息内容" --receive-id "ou_xxx"`
 - 环境变量：
-  - `FEISHU_APP_ID` / `FEISHU_APP_SECRET`
-  - `FEISHU_RECEIVE_ID`（可选：发送消息时作为默认收件人；更推荐显式传 `--receive-id`）
-- env 文件（推荐）：
+  - `FEISHU_APP_ID` / `FEISHU_APP_SECRET` / `FEISHU_RECEIVE_ID`
+- env 文件：
   - 默认：`~/.config/feishu-im-send/env`
   - 覆盖：`--env-file <path>` 或 `FEISHU_IM_SEND_ENV_FILE=<path>`
   - 优先级：进程环境变量 > env 文件
@@ -45,26 +43,27 @@ description: 使用飞书开放平台内部应用发送 text 消息到指定 ope
 ### 依赖与缓存
 
 - Node.js（建议 `>= 18`，脚本使用内置 `fetch` 与 `crypto.randomUUID()`）
+  - 若 Node 为 16/17：请使用 `node --experimental-fetch scripts/feishu-im-send.js ...`
 - 需要可访问 `https://fsopen.bytedance.net/`
 - Token 缓存：`~/.cache/feishu-im-send/tenant_access_token.json`（401/403 会自动清缓存并重试一次）
 
 ## Examples
 
-- 发送一条消息（推荐显式指定接收人，避免误发）：
-  - `node feishu-im-send/scripts/feishu-im-send.js --text "hello" --receive-id "ou_xxx"`
+- 发送一条消息：
+  - `node scripts/feishu-im-send.js --text "hello"`
 - 初始化/维护凭证（写入 env 文件，权限为 600）：
-  - `node feishu-im-send/scripts/feishu-im-send.js --configure`
+  - `node scripts/feishu-im-send.js --configure`
 - 无交互写入（适合脚本/CI；`--force` 允许覆盖并备份）：
-  - `node feishu-im-send/scripts/feishu-im-send.js --configure --app-id "xxx" --app-secret "yyy" --receive-id "ou_xxx" --force`
+  - `node scripts/feishu-im-send.js --configure --app-id "xxx" --app-secret "yyy" --receive-id "ou_xxx" --force`
 - 查看当前解析到的配置（secret 会脱敏）：
-  - `node feishu-im-send/scripts/feishu-im-send.js --show-config`
+  - `node scripts/feishu-im-send.js --show-config`
 - 查看命令行用法（用于自检文档/实现一致性）：
-  - `node feishu-im-send/scripts/feishu-im-send.js --help`
+  - `node scripts/feishu-im-send.js --help`
 
 ## Guidelines
 
-- 三件套同步：调整行为/参数时，同时检查 `feishu-im-send/scripts/feishu-im-send.js`、CLI 入口（如有）、本文件是否需要同步更新。
+- 三件套同步：调整行为/参数时，同时检查 `scripts/feishu-im-send.js`、CLI 入口（如有）、本文件是否需要同步更新。
 - `receive_id` 必须是 `open_id`：文档示例统一使用 `ou_xxx`，避免误传 `union_id`/`email`。
 - 凭证不要进仓库：密钥只放环境变量或 `~/.config/feishu-im-send/env`。
 - 不要发送敏感信息：token、cookie、密钥、用户数据等禁止发送到 IM。
-- 排障优先自检：优先跑 `node feishu-im-send/scripts/feishu-im-send.js --show-config` 确认到底读了哪份配置；必要时删除缓存 `rm -f ~/.cache/feishu-im-send/tenant_access_token.json`。
+- 排障优先自检：优先跑 `node scripts/feishu-im-send.js --show-config` 确认到底读了哪份配置；必要时删除缓存 `rm -f ~/.cache/feishu-im-send/tenant_access_token.json`。
