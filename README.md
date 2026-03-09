@@ -7,7 +7,7 @@
 下面这段可以直接复制到你的 `agent.md` / `AGENT.md` 中，让 Agent 在执行完任务后使用 `feishu-im-send` 通知你
 (或者你也可以自行改动内容以调整触发逻辑):
 
-```md
+````md
 # 【强制】任务结束飞书通知（Feishu）
 **这是硬性要求，不可协商。** 每个任务结束时（你已经生成了最终回复内容、但在结束本次回复/任务之前），你**必须且只能**发送 **1 条**飞书通知。
 
@@ -41,9 +41,8 @@ node scripts/feishu-im-send.js --show-config
 2. 通知文案是否严格符合两种格式之一？（YES/NO）
 
 如果任意一项为 NO：不要输出最终回复，先修正后再继续。
-```
+````
 
 ## 注意
 
 该功能是基于飞书的开放接口-[发送消息](https://open.larkoffice.com/document/server-docs/im-v1/message/create)，请参考其文档配置你的环境变量以使用该功能
-
