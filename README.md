@@ -25,16 +25,8 @@
 - 通知中**禁止**包含任何敏感信息（token/cookie/密钥/用户数据/raw logs/堆栈等）。
 
 ## 发送方式
-```bash
-# 在 `agents/skills/feishu-im-send/` 目录下执行
-node scripts/feishu-im-send.js "<TaskName> 已完成，可查看结果"
-```
-
-自检配置：
-```bash
-# 在 `agents/skills/feishu-im-send/` 目录下执行
-node scripts/feishu-im-send.js --show-config
-```
+- 使用 `feishu-im-send` 这个 skill 发送一条 **text** 消息。
+- 只发送 1 条，内容严格符合上面两种格式之一。
 
 ## 自检清单（发送最终回复前必须完成）
 1. 我是否已发送且只发送了 1 次飞书通知？（YES/NO）
@@ -42,6 +34,12 @@ node scripts/feishu-im-send.js --show-config
 
 如果任意一项为 NO：不要输出最终回复，先修正后再继续。
 ````
+
+### 命令行用法（可选，用于人工调试/排障）
+
+- 发送一条消息：`node scripts/feishu-im-send.js "<TaskName> 已完成，可查看结果"`
+- 查看当前解析到的配置：`node scripts/feishu-im-send.js --show-config`
+- 交互式写入配置：`node scripts/feishu-im-send.js --configure`
 
 ## 注意
 
